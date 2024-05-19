@@ -66,28 +66,44 @@ model.eval()
 
 ### palettization stuff ###
 # model is already defined as noted above
+# Define the loss function and optimizer
 loss_fn = nn.MSELoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+optimizer = SGD(model.parameters(), lr=0.01, momentum=0.9)
+
+# Function to create data
+def create_data():
+    # Placeholder data creation function
+    # Replace with actual data loading and preprocessing
+    inputs = torch.randn(10, 3, 256)  # Example input tensor
+    labels = torch.randn(10, 256)  # Example label tensor
+    return [(inputs, labels)]
+
 data = create_data()
 
-
 # Prepare model for palettization
-config = DKMPalettizerConfig(global_config=ModuleDKMPalettizerConfig(n_bits=6, weight_threshold = 512, quantize_activations=True))
-# the following modules are available for palettization
-# torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d, torch.nn.Linear, torch.nn.LayerNorm, torch.nn.Embedding, and torch.nn.MultiheadAttention
-palettizer = DKMPalettizer(model, config)
+config = DKMPalettizerConfig(global_config=ModuleDKMPalettizerConfig(
+    n_bits=6,
+    weight_threshold=512,
+    quantize_activations=True
+))
 
+# Available modules for palettization
+# torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d, torch.nn.Linear,
+# torch.nn.LayerNorm, torch.nn.Embedding, torch.nn.MultiheadAttention
+
+palettizer = DKMPalettizer(model, config)
 prepared_model = palettizer.prepare()
 
-# Fine-tune the model for a few epochs after this.
+# Fine-tune the model for a few epochs
 for inputs, labels in data:
-    output = model(inputs)
-    loss = loss_fn(output, labels)
+    optimizer.zero_grad()  # Clear the gradients
+    outputs = model(inputs)
+    loss = loss_fn(outputs, labels)
     loss.backward()
     optimizer.step()
     palettizer.step()
 
-# prepare for conversion
+# Finalize the model
 finalized_model = palettizer.finalize(inplace=True)
 
 # then trace and then ct convert
