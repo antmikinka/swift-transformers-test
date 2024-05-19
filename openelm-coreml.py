@@ -7,6 +7,14 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # When using float16, all predicted logits are 0. To be debugge
 
+
+from coremltools.optimize.torch.palettization import (
+    DKMPalettizer,
+    DKMPalettizerConfig,
+    ModuleDKMPalettizerConfig,
+)
+
+
 def selector(op):
     return op.op_type != "l2_norm"
     
@@ -56,29 +64,74 @@ tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
 model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True)
 model.eval()
 
+### palettization stuff ###
+# model is already defined as noted above
+loss_fn = nn.MSELoss()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+data = create_data()
+
+
+# Prepare model for palettization
+config = DKMPalettizerConfig(global_config=ModuleDKMPalettizerConfig(n_bits=6, weight_threshold = 512, quantize_activations=True))
+# the following modules are available for palettization
+# torch.nn.Conv1d, torch.nn.Conv2d, torch.nn.Conv3d, torch.nn.Linear, torch.nn.LayerNorm, torch.nn.Embedding, and torch.nn.MultiheadAttention
+palettizer = DKMPalettizer(model, config)
+
+prepared_model = palettizer.prepare()
+
+# Fine-tune the model for a few epochs after this.
+for inputs, labels in data:
+    output = model(inputs)
+    loss = loss_fn(output, labels)
+    loss.backward()
+    optimizer.step()
+    palettizer.step()
+
+# prepare for conversion
+finalized_model = palettizer.finalize(inplace=True)
+
+# then trace and then ct convert
+
+### ending palettization stuff ###
+
+
+
+
+
+
+
+## palettization may need to be after the code below. idk if it will work but lets try.
+
 inputs = {
     "input_ids": np.random.randint(0, tokenizer.vocab_size, shape),
 }
 
 with torch.no_grad():
     t_inputs = {k: torch.tensor(v, dtype=torch.int32) for k, v in inputs.items()}
-    outputs = model(**t_inputs, use_cache=False)
+    outputs = finalized_model(**t_inputs, use_cache=False)
 
 class Wrapper(nn.Module):
     def __init__(self, model):
         super().__init__()
-        self.model = model
+        self.finalized_model = finalized_model
         
     def forward(self, *args, **kwargs):
         input_ids = args[0]
-        return self.model(
+        return self.finalized_model(
             input_ids=input_ids,
             return_dict=False,
             use_cache=False,
             **kwargs
         )
 
-to_jit = Wrapper(model)
+
+
+
+
+
+
+
+to_jit = Wrapper(finalized_model)
 jit_inputs = list(t_inputs.values())
 jitted_model = torch.jit.trace(to_jit, jit_inputs)
 jitted_model.eval();
@@ -95,8 +148,8 @@ coreml_input_types = [ct.TensorType(
     shape=ct.Shape(shape=shape),
     dtype=np.int32,
 )]
-coreml_output_types = [ct.TensorType(name=name) for name in outputs.keys()]
-
+#coreml_output_types = [ct.TensorType(name=name) for name in outputs.keys()]
+coreml_output_types = [ct.TensorType(name=name, dtype=np.float32) for name in outputs.keys()]
 
 # Conversion fails with `Conversion for torch.repeat_interleave with non-zero dim has not been implemented`.
 # We hack a special case shortcut when the first dim is `1`.
@@ -208,12 +261,6 @@ for layer in model.transformer.layers:
     layer.attn.k_norm = CustomRMSNorm(layer.attn.k_norm.weight, layer.attn.k_norm.eps)
     layer.ffn_norm = CustomRMSNorm(layer.ffn_norm.weight, layer.ffn_norm.eps)
     layer.attn_norm = CustomRMSNorm(layer.attn_norm.weight, layer.attn_norm.eps)
-###
-
-                
-#compute_precision = ct.transform.FP16ComputePrecision(selector)
-###
-
 
 
 
@@ -227,6 +274,7 @@ coreml_model = ct.convert(
     outputs=coreml_output_types,
     compute_precision=compute_precision,
     compute_units=compute_units,
+    pass_pipeline=ct.PassPipeline.DEFAULT_PALETTIZATION, # palettization
 )
 
 
