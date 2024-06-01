@@ -8,7 +8,7 @@
     - Class LlamaAttention
       - key_states = torch.repeat_interleave(key_states, dim=1, repeats=self.n_kv_groups)
       - value_states = torch.repeat_interleave(value_states, dim=1, repeats=self.n_kv_groups)
-- Review chunk_mlprogram.py (changed from [apple/ml-stable-diffusion](https://github.com/apple/ml-stable-diffusion/blob/main/python_coreml_stable_diffusion/chunk_mlprogram.py))
+- Review [chunk_mlprogram.py](https://github.com/antmikinka/swift-transformers-test/blob/main/chunk_mlprogram.py) (changed from [apple/ml-stable-diffusion](https://github.com/apple/ml-stable-diffusion/blob/main/python_coreml_stable_diffusion/chunk_mlprogram.py))
 	- Optimize for chunking text LLMs
 	- needs to check PSNR 
 		- random_gen_input_feature_type func is not working due to the model being converted, not properly displaying a value type to let the func know how to generate those input features (this seems to be the issue)
@@ -18,10 +18,12 @@
 
 
 ## Ways to View Layers, OPs, & Precision
-- The difference is the way they display information and how they get it
-- [CoreMLInspect](https://github.com/smpanaro/CoreMLInspect)
-- layer-iteration.py
-
+- The differences: how they get info, how they display it, and environment packages
+- [smpanaro/CoreMLInspect](https://github.com/smpanaro/CoreMLInspect)
+	- this would work basically all around in any env
+- [layer-iteration.py](https://github.com/antmikinka/swift-transformers-test/blob/main/layer-iteration.py)
+	- this requires something similar to [ml-explore/mlx-examples](https://github.com/ml-explore/mlx-examples) env 
+	- due to missing PIL package, I had issues using my python venv
 
 
   
