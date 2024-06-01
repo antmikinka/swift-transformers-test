@@ -39,9 +39,18 @@
 - OpenELM-1B-Instruct (may not come, have to determine if RAM or Storage Issue)
 
 
+
+
+## Performance Tests
+- Chunked OpenELM-270M-Instruct
+- Not Chunked OpenELM-270M-Instruct
+
+
+
 ## Models
-- 
+- [anthonymikinka/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline](https://huggingface.co/anthonymikinka/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline/tree/main)
 
 
-
+### update media area
+old photo
 ![newgithub-anthonymikinka-swift-transformers-test](https://github.com/antmikinka/swift-transformers-test/assets/67480807/05282faf-88f7-450b-a10b-0d87a261e894)
