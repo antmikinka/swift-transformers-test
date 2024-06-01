@@ -47,6 +47,15 @@
 
 
 
-## Models
+
+## OpenELM-270M-Instruct
+#### Chunked
 - [anthonymikinka/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline](https://huggingface.co/anthonymikinka/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline/tree/main)
 
+
+## OpenELM-1B-Instruct
+- [anthonymikinka/OpenELM-1_1B-Instruct-128-FP16ComputePrecision_v2](https://huggingface.co/anthonymikinka/OpenELM-1_1B-Instruct-128-FP16ComputePrecision_v2)
+  
+#### Palttized
+- [anthonymikinka/OpenELM-1_1B-Instruct-128-FP16ComputePrecision_v2-Palettized-Kmeans-4bits](https://huggingface.co/anthonymikinka/OpenELM-1_1B-Instruct-128-FP16ComputePrecision_v2-Palettized-Kmeans-4bits)
+- [anthonymikinka/OpenELM-1_1B-Instruct-128-FP16ComputePrecision_v2-Palettized-Kmeans-6Bits](https://huggingface.co/anthonymikinka/OpenELM-1_1B-Instruct-128-FP16ComputePrecision_v2-Palettized-Kmeans-6Bits)
