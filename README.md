@@ -42,15 +42,11 @@
 
 
 ## Performance Tests
-- Chunked OpenELM-270M-Instruct
-- Not Chunked OpenELM-270M-Instruct
+- [Chunked OpenELM-270M-Instruct](https://github.com/antmikinka/swift-transformers-test/blob/main/Model%20Performance%20Tests/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline%20PERFORMANCE%20TEST.png)
+- [Not Chunked OpenELM-270M-Instruct](https://github.com/antmikinka/swift-transformers-test/blob/main/Model%20Performance%20Tests/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2%20PERFORMANCE%20TEST.png)
 
 
 
 ## Models
 - [anthonymikinka/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline](https://huggingface.co/anthonymikinka/OpenELM-270M-Instruct-128-FP16ComputePrecisionv2_chunked_pipeline/tree/main)
 
-
-### update media area
-old photo
-![newgithub-anthonymikinka-swift-transformers-test](https://github.com/antmikinka/swift-transformers-test/assets/67480807/05282faf-88f7-450b-a10b-0d87a261e894)
